@@ -36,6 +36,8 @@
 					this.pressing= true;
 					this.$emit( 'press' );
 					wait( 200 ).then( ()=> this.pressing= false );
+
+					return true;
 				},
 				pressing: false,
 			};
