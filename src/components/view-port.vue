@@ -6,7 +6,10 @@
 
 <script>
 	import graph from '@/graph';
+	import Matrix from '@/matrix';
+	import { cos, sin, PI, } from '@/math';
 	import { mousedown, mousemove, mouseup, } from '@/mouse-or-touch';
+	import { listen, unlisten, } from '@/key-map';
 
 	export default {
 
@@ -22,9 +25,7 @@
 			canvasPosition()
 			{
 				return {
-					left:`${this.viewPort.x}px`,
-					top:`${this.viewPort.y}px`,
-					width:`${100*this.viewPort.s}%`,
+					transform: `matrix(${this.matrix.data[0][0]},${this.matrix.data[1][0]},${this.matrix.data[0][1]},${this.matrix.data[1][1]},${this.matrix.data[0][2]},${this.matrix.data[1][2]})`,
 				};
 			},
 		},
@@ -35,12 +36,10 @@
 
 				graph,
 
-				viewPort:
-				{
-					x: 0,
-					y: 0,
-					s: 1,
-				},
+				width:0,
+				height:0,
+
+				matrix: new Matrix( 3, ),
 
 				viewHandle:
 				{
@@ -50,7 +49,71 @@
 						y:0,
 					},
 
-					start: e=>{
+					transform: ( matrix, before=true, )=>{
+						this.matrix= (
+							before
+							? Matrix.multiply( new Matrix( 3, matrix, ), this.matrix, )
+							: Matrix.multiply( this.matrix, new Matrix( 3, matrix, ), )
+						);
+
+						return true;
+					},
+
+
+					move: ( dx, dy, )=>{
+						return this.viewHandle.transform(
+							[
+								[  1,  0, dx, ],
+								[  0,  1, dy, ],
+								[  0,  0,  1, ],
+							],
+						);
+					},
+
+					scale: ( times, ox=0, oy=0, )=>{
+
+						return this.viewHandle.transform(
+							[
+								[ times,     0, ox-ox*times, ],
+								[     0, times, oy-oy*times, ],
+								[     0,     0,           1, ],
+							],
+						);
+
+						return true;
+					},
+
+					rotate: ( angle )=>{
+
+						return this.viewHandle.transform(
+							[
+								[ +cos( angle, ), +sin( angle, ), 0, ],
+								[ -sin( angle, ), +cos( angle, ), 0, ],
+								[              0,              0, 1, ],
+							],
+						);
+
+						return true;
+
+						return true;
+					},
+
+					reset: ()=>{
+						this.matrix= new Matrix( 3, );
+					},
+
+					keyMoveLeft:  e=> this.viewHandle.move( +10,   0, ),
+					keyMoveRight: e=> this.viewHandle.move( -10,   0, ),
+					keyMoveUp:    e=> this.viewHandle.move(   0, +10, ),
+					keyMoveDown:  e=> this.viewHandle.move(   0, -10, ),
+
+					keyRotateLeft:  e=> this.viewHandle.rotate( +PI/72, ),
+					keyRotateRight: e=> this.viewHandle.rotate( -PI/72, ),
+
+					keyScaleUp:     e=> this.viewHandle.scale( 1.02,   ),
+					keyScaleDown:   e=> this.viewHandle.scale( 1/1.02, ),
+
+					startMouseMoving: e=>{
 						if( 4!==e.buttons ) return;
 
 						[ this.viewHandle.origin.x, this.viewHandle.origin.y, ]= [ e.clientX, e.clientY, ];
@@ -64,41 +127,25 @@
 						[ this.viewHandle.origin.x, this.viewHandle.origin.y, ]= [ e.clientX, e.clientY, ];
 					},
 
-					move: ( dx, dy, )=>{
-						this.viewPort.x+= dx;
-						this.viewPort.y+= dy;
-					},
-
-					end: ()=>{
+					stopMouseMoving: ()=>{
 						document.removeEventListener( mousemove, this.viewHandle.mouseMove, );
 					},
 
 					wheelScale: e=>{
-						this.viewHandle.scale( e.deltaY<0, e.offsetX, e.offsetY, )
+						this.viewHandle.scale(
+							(
+								e.deltaY<0
+								? 1/1.02
+								: 1.02
+							),
+							e.offsetX - this.width/2,
+							e.offsetY - this.height/2,
+						)
 					},
 
-					scale: ( scaleUp, ox, oy, )=>{
-
-						const r= 1.02;
-
-						if( scaleUp )
-						{
-							this.viewPort.s*= r;
-							this.viewPort.x= (this.viewPort.x - ox)*r + ox;
-							this.viewPort.y= (this.viewPort.y - oy)*r + oy;
-						}
-						else
-						{
-							this.viewPort.s/= r;
-							this.viewPort.x= (this.viewPort.x - ox)/r + ox;
-							this.viewPort.y= (this.viewPort.y - oy)/r + oy;
-						}
-					},
-
-					reset: ()=>{
-						this.viewPort.x= 0;
-						this.viewPort.y= 0;
-						this.viewPort.s= 1;
+					windowResize: e=>{
+						this.width= this.$refs.main.firstElementChild.clientWidth;
+						this.height= this.$refs.main.firstElementChild.clientHeight;
 					},
 				},
 			};
@@ -106,19 +153,46 @@
 
 		mounted()
 		{
+			listen( 'ArrowLeft_4',  this.viewHandle.keyMoveLeft,  );
+			listen( 'ArrowRight_4', this.viewHandle.keyMoveRight, );
+			listen( 'ArrowUp_4',    this.viewHandle.keyMoveUp,    );
+			listen( 'ArrowDown_4',  this.viewHandle.keyMoveDown,  );
+
+			listen( 'ArrowLeft_5',  this.viewHandle.keyRotateLeft,  );
+			listen( 'ArrowRight_5', this.viewHandle.keyRotateRight, );
+			listen( 'ArrowUp_5',    this.viewHandle.keyScaleUp,     );
+			listen( 'ArrowDown_5',  this.viewHandle.keyScaleDown,   );
+
+			listen( 'Escape_4',     this.viewHandle.reset, );
+
 			this.$refs.main.addEventListener( 'wheel', this.viewHandle.wheelScale, );
 			this.$refs.main.addEventListener( 'dblclick', this.viewHandle.reset, );
-			this.$refs.main.addEventListener( mousedown, this.viewHandle.start, );
-			document.addEventListener( mouseup, this.viewHandle.end, );
+			this.$refs.main.addEventListener( mousedown, this.viewHandle.startMouseMoving, );
+			document.addEventListener( mouseup, this.viewHandle.stopMouseMoving, );
+			window.addEventListener( 'resize', this.viewHandle.windowResize, );
+			this.viewHandle.windowResize();
 		},
 
 		beforeDestroy()
 		{
+			unlisten( 'ArrowLeft_4',  this.viewHandle.keyMoveLeft,  );
+			unlisten( 'ArrowRight_4', this.viewHandle.keyMoveRight, );
+			unlisten( 'ArrowUp_4',    this.viewHandle.keyMoveUp,    );
+			unlisten( 'ArrowDown_4',  this.viewHandle.keyMoveDown,  );
+
+			unlisten( 'ArrowLeft_5',  this.viewHandle.keyRotateLeft,  );
+			unlisten( 'ArrowRight_5', this.viewHandle.keyRotateRight, );
+			unlisten( 'ArrowUp_5',    this.viewHandle.keyScaleUp,     );
+			unlisten( 'ArrowDown_5',  this.viewHandle.keyScaleDown,   );
+
+			unlisten( 'Escape_4',     this.viewHandle.reset, );
+
 			this.$refs.main.removeEventListener( 'wheel', this.viewHandle.wheelScale, );
 			this.$refs.main.removeEventListener( 'dblclick', this.viewHandle.reset, );
-			this.$refs.main.removeEventListener( mousedown, this.viewHandle.start, );
+			this.$refs.main.removeEventListener( mousedown, this.viewHandle.startMouseMoving, );
 			document.removeEventListener( mousemove, this.viewHandle.mouseMove, );
-			document.removeEventListener( mouseup, this.viewHandle.end, );
+			document.removeEventListener( mouseup, this.viewHandle.stopMouseMoving, );
+			window.removeEventListener( 'resize', this.viewHandle.windowResize, );
 		},
 
 	};
