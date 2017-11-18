@@ -106,19 +106,19 @@
 
 		mounted()
 		{
-			this.$refs.main.addEventListener( 'wheel', this.viewHandle.wheelScale );
-			this.$refs.main.addEventListener( 'dblclick', this.viewHandle.reset );
-			this.$refs.main.addEventListener( mousedown, this.viewHandle.start );
-			document.addEventListener( mouseup, this.viewHandle.end );
+			this.$refs.main.addEventListener( 'wheel', this.viewHandle.wheelScale, );
+			this.$refs.main.addEventListener( 'dblclick', this.viewHandle.reset, );
+			this.$refs.main.addEventListener( mousedown, this.viewHandle.start, );
+			document.addEventListener( mouseup, this.viewHandle.end, );
 		},
 
 		beforeDestroy()
 		{
-			this.$refs.main.removeEventListener( 'wheel', this.viewHandle.wheelScale );
-			this.$refs.main.removeEventListener( 'dblclick', this.viewHandle.reset );
-			this.$refs.main.removeEventListener( mousedown, this.viewHandle.start );
-			document.removeEventListener( mousemove, this.viewHandle.mouseMove );
-			document.removeEventListener( mouseup, this.viewHandle.end );
+			this.$refs.main.removeEventListener( 'wheel', this.viewHandle.wheelScale, );
+			this.$refs.main.removeEventListener( 'dblclick', this.viewHandle.reset, );
+			this.$refs.main.removeEventListener( mousedown, this.viewHandle.start, );
+			document.removeEventListener( mousemove, this.viewHandle.mouseMove, );
+			document.removeEventListener( mouseup, this.viewHandle.end, );
 		},
 
 	};

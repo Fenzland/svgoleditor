@@ -25,12 +25,12 @@
 		{
 			create( element )
 			{
-				this.$emit( 'create', element );
+				this.$emit( 'create', element, );
 			},
 
 			cancel()
 			{
-				this.$emit( 'cancel' );
+				this.$emit( 'cancel', );
 			},
 		},
 

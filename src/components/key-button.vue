@@ -25,7 +25,7 @@
 		{
 			comment()
 			{
-				return keyComment( this.keyGroup );
+				return keyComment( this.keyGroup, );
 			},
 		},
 
@@ -34,8 +34,8 @@
 			return {
 				press:()=> {
 					this.pressing= true;
-					this.$emit( 'press' );
-					wait( 200 ).then( ()=> this.pressing= false );
+					this.$emit( 'press', );
+					wait( 200, ).then( ()=> this.pressing= false, );
 
 					return true;
 				},
@@ -45,12 +45,12 @@
 
 		mounted()
 		{
-			listen( this.keyGroup, this.press );
+			listen( this.keyGroup, this.press, );
 		},
 
 		beforeDestroy()
 		{
-			unlisten( this.keyGroup, this.press );
+			unlisten( this.keyGroup, this.press, );
 		},
 
 	};
