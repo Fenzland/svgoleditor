@@ -3,9 +3,20 @@ const chanConnection= new WeakMap();
 
 function keyPress( key, modifier )
 {
-	const action= keyMap[z(`${key}_${modifier}`)];
+	let action= keyMap[z(`${key}_${modifier}`)];
 
-	return action && action();
+	if(!( action )) return;
+
+	let result;
+
+	do{
+		result= action();
+
+		if( result ) return result;
+	}
+	while( chanConnection.has( action ) && (action= chanConnection.get( action )) );
+
+	return result;
 }
 
 export function boot()
