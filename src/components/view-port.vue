@@ -55,26 +55,33 @@
 
 						[ this.viewHandle.origin.x, this.viewHandle.origin.y, ]= [ e.clientX, e.clientY, ];
 
-						document.addEventListener( mousemove, this.viewHandle.move );
+						document.addEventListener( mousemove, this.viewHandle.mouseMove, );
 					},
 
-					move: e=>{
-						this.viewPort.x+= (e.clientX - this.viewHandle.origin.x);
-						this.viewPort.y+= (e.clientY - this.viewHandle.origin.y);
+					mouseMove: e=>{
+						this.viewHandle.move( e.clientX - this.viewHandle.origin.x, e.clientY - this.viewHandle.origin.y, );
 
 						[ this.viewHandle.origin.x, this.viewHandle.origin.y, ]= [ e.clientX, e.clientY, ];
 					},
 
-					end: ()=>{
-						document.removeEventListener( mousemove, this.viewHandle.move );
+					move: ( dx, dy, )=>{
+						this.viewPort.x+= dx;
+						this.viewPort.y+= dy;
 					},
 
-					scale: e=>{
-						const r= 1.02;
-						const ox= e.offsetX;
-						const oy= e.offsetY;
+					end: ()=>{
+						document.removeEventListener( mousemove, this.viewHandle.mouseMove, );
+					},
 
-						if( e.deltaY<0 )
+					wheelScale: e=>{
+						this.viewHandle.scale( e.deltaY<0, e.offsetX, e.offsetY, )
+					},
+
+					scale: ( scaleUp, ox, oy, )=>{
+
+						const r= 1.02;
+
+						if( scaleUp )
 						{
 							this.viewPort.s*= r;
 							this.viewPort.x= (this.viewPort.x - ox)*r + ox;
@@ -88,7 +95,7 @@
 						}
 					},
 
-					reset: e=>{
+					reset: ()=>{
 						this.viewPort.x= 0;
 						this.viewPort.y= 0;
 						this.viewPort.s= 1;
@@ -99,7 +106,7 @@
 
 		mounted()
 		{
-			this.$refs.main.addEventListener( 'wheel', this.viewHandle.scale );
+			this.$refs.main.addEventListener( 'wheel', this.viewHandle.wheelScale );
 			this.$refs.main.addEventListener( 'dblclick', this.viewHandle.reset );
 			this.$refs.main.addEventListener( mousedown, this.viewHandle.start );
 			document.addEventListener( mouseup, this.viewHandle.end );
@@ -107,10 +114,10 @@
 
 		beforeDestroy()
 		{
-			this.$refs.main.removeEventListener( 'wheel', this.viewHandle.scale );
+			this.$refs.main.removeEventListener( 'wheel', this.viewHandle.wheelScale );
 			this.$refs.main.removeEventListener( 'dblclick', this.viewHandle.reset );
 			this.$refs.main.removeEventListener( mousedown, this.viewHandle.start );
-			document.removeEventListener( mousemove, this.viewHandle.move );
+			document.removeEventListener( mousemove, this.viewHandle.mouseMove );
 			document.removeEventListener( mouseup, this.viewHandle.end );
 		},
 
