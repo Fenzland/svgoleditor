@@ -39,18 +39,20 @@
 		{
 			border-radius:
 				calc(var(--size)/4) calc(var(--size)*7) 0 calc(var(--size)*1)/calc(var(--size)/4) calc(var(--size)*1) 0 calc(var(--size)*7)
-				;
-				left:calc(var(--size)*-1);
-				top:calc(var(--size)*-1);
+			;
+			left:calc(var(--size)*-1);
+			top:calc(var(--size)*-1);
+			clip-path: polygon(-20% -20%, 100% 0, 100% 12.5%, 12.5% 12.5%, 12.5% 100%, 0% 100% );
 		}
 
 		.resizable>.resize-handle.right-bottom
 		{
 			border-radius:
 				0 calc(var(--size)*1) calc(var(--size)/4) calc(var(--size)*7)/0 calc(var(--size)*7) calc(var(--size)/4) calc(var(--size)*1)
-				;
-				right:calc(var(--size)*-1);
-				bottom:calc(var(--size)*-1);
+			;
+			right:calc(var(--size)*-1);
+			bottom:calc(var(--size)*-1);
+			clip-path: polygon(120% 120%, 0 100%, 0 87.5%, 87.5% 87.5%, 87.5% 0, 100% 0 );
 		}
 
 	</style>
