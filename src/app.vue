@@ -3,6 +3,7 @@
 		<header></header>
 		<work-pad></work-pad>
 		<view-port></view-port>
+		<help></help>
 		<footer></footer>
 	</main>
 </template>
@@ -10,6 +11,7 @@
 <script>
 	import viewPort from './components/view-port';
 	import workPad from './components/work-pad';
+	import help from './components/help';
 
 	export default {
 
@@ -19,6 +21,7 @@
 		{
 			viewPort,
 			workPad,
+			help,
 		},
 	};
 </script>
