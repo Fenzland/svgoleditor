@@ -1,6 +1,8 @@
 <template>
 	<main ref="main">
-		<svg class="canvas" :viewBox="viewBox" :style="canvasPosition"></svg>
+		<resizable class="canvas" :style="canvasPosition">
+			<svg :viewBox="viewBox"></svg>
+		</resizable>
 	</main>
 </template>
 
@@ -10,10 +12,16 @@
 	import { cos, sin, PI, } from '@/math';
 	import { mousedown, mousemove, mouseup, } from '@/mouse-or-touch';
 	import { listen, unlisten, } from '@/key-map';
+	import resizable from './tools/resizable';
 
 	export default {
 
 		name: 'view-port',
+
+		components:
+		{
+			resizable,
+		},
 
 		computed:
 		{
@@ -213,7 +221,10 @@
 		}
 
 		#main>main>.canvas
-		{ position:absolute; }
+		{ position:absolute; width:100%; }
+
+		#main>main>.canvas>svg
+		{ display:block; }
 
 	</style>
 <!-- /layout -->
@@ -222,7 +233,18 @@
 	<style>
 
 		#main>main>.canvas
-		{ background-color:hsl(0,0%,100%); box-shadow:0 0 .5vw 0 hsla(0,0%,0%,.25); }
+		{ --grid-color:hsl(180,20%,94%); }
+
+		#main>main>.canvas
+		{
+			box-shadow:0 .2vh .5vw 0 hsla(0,0%,0%,.25);
+			background-image: linear-gradient(45deg,var(--grid-color) 25%,transparent 25%,transparent 75%,var(--grid-color) 75%),linear-gradient(45deg,var(--grid-color) 25%,transparent 25%,transparent 75%,var(--grid-color) 75%);
+			background-size: 2em 2em;
+			background-position: 0 0, 1em 1em;
+		}
+
+		#main>main>.canvas>svg
+		{ background-color:hsl(0,0%,100%); }
 
 	</style>
 <!-- /theme -->
