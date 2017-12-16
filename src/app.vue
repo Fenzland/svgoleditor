@@ -1,7 +1,14 @@
 <template>
 	<main id="main">
 		<header></header>
-		<work-pad></work-pad>
+		<pagination tag-name="aside" list-id="main">
+			<page slot="0" slot-scope="pagination" :start="pagination.start" :count="pagination.count"></page>
+			<page slot="1" slot-scope="pagination" :start="pagination.start" :count="pagination.count"></page>
+			<div slot="head-loading">Loading...</div>
+			<div slot="tail-loading">Loading...</div>
+			<div slot="ending">--- The End ---</div>
+		</pagination>
+		<!-- <work-pad></work-pad> -->
 		<view-port></view-port>
 		<help></help>
 		<footer></footer>
@@ -12,6 +19,8 @@
 	import viewPort from './components/view-port';
 	import workPad from './components/work-pad';
 	import help from './components/help';
+	import pagination from '@/pagination';
+	import page from './components/page';
 
 	export default {
 
@@ -22,6 +31,14 @@
 			viewPort,
 			workPad,
 			help,
+			pagination,
+			page,
+		},
+
+		data()
+		{
+			return {
+			};
 		},
 	};
 </script>
